@@ -1,0 +1,5 @@
+enable_aws_resources = false
+aws_region           = "ap-northeast-2"
+
+# 실제 plan 전 승인된 개발자/VPN CIDR만 입력합니다.
+backend_ingress_cidrs = []

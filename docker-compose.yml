@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: kb-ai-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: kbai
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_dev_password
+    ports:
+      - "55432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d kbai"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  aiserver:
+    build:
+      context: ../aiserver
+    environment:
+      DATABASE_URL: postgresql://kb_ai_user:kb_ai_password@postgres:5432/kbai
+      AI_MODEL_PROVIDER: ${AI_MODEL_PROVIDER:-rules}
+      UPSTAGE_API_KEY: ${UPSTAGE_API_KEY:-}
+      UPSTAGE_MODEL: ${UPSTAGE_MODEL:-solar-pro3}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    build:
+      context: ../backend
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/kbai
+      AI_BASE_URL: http://aiserver:8000
+      DOCUMENT_STORAGE_DIR: /var/lib/kb-ai/documents
+    ports:
+      - "8080:8080"
+    volumes:
+      - document_data:/var/lib/kb-ai/documents
+    depends_on:
+      postgres:
+        condition: service_healthy
+      aiserver:
+        condition: service_started
+
+volumes:
+  postgres_data:
+  document_data:
