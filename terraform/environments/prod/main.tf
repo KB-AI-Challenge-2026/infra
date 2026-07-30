@@ -5,28 +5,30 @@ module "platform" {
   enable_ecs_services  = var.enable_ecs_services
 
   project_name = var.project_name
-  environment  = "dev"
+  environment  = "prod"
   aws_region   = var.aws_region
   vpc_cidr     = var.vpc_cidr
 
   backend_ingress_cidrs   = var.backend_ingress_cidrs
   backend_certificate_arn = var.backend_certificate_arn
   enable_nat_gateway      = var.enable_nat_gateway
-  nat_gateway_count       = 1
+  nat_gateway_count       = 2
 
-  db_instance_class          = var.db_instance_class
-  db_allocated_storage       = var.db_allocated_storage
-  db_backup_retention_days   = 1
-  db_multi_az                = false
-  db_deletion_protection     = false
-  db_skip_final_snapshot     = true
-  document_retention_days    = var.document_retention_days
-  document_bucket_name       = var.document_bucket_name
-  document_force_destroy     = true
-  alb_deletion_protection    = false
-  log_retention_days         = 14
-  backend_desired_count      = 1
-  aiserver_desired_count     = 1
+  db_instance_class        = var.db_instance_class
+  db_allocated_storage     = var.db_allocated_storage
+  db_backup_retention_days = var.db_backup_retention_days
+  db_multi_az              = true
+  db_deletion_protection   = true
+  db_skip_final_snapshot   = false
+
+  document_retention_days = var.document_retention_days
+  document_bucket_name    = var.document_bucket_name
+  document_force_destroy  = false
+  alb_deletion_protection = true
+  log_retention_days      = var.log_retention_days
+
+  backend_desired_count      = var.backend_desired_count
+  aiserver_desired_count     = var.aiserver_desired_count
   backend_image_uri          = var.backend_image_uri
   aiserver_image_uri         = var.aiserver_image_uri
   service_environment        = var.service_environment

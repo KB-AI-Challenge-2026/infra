@@ -1,11 +1,11 @@
 output "vpc_id" {
   value       = module.platform.vpc_id
-  description = "dev VPC ID"
+  description = "prod VPC ID"
 }
 
 output "database_endpoint" {
   value       = module.platform.database_endpoint
-  description = "PostgreSQL endpoint"
+  description = "운영 PostgreSQL endpoint"
 }
 
 output "database_master_secret_arn" {
@@ -16,30 +16,30 @@ output "database_master_secret_arn" {
 
 output "document_bucket_name" {
   value       = module.platform.document_bucket_name
-  description = "암호화된 비공개 문서 버킷"
+  description = "운영 암호화 비공개 문서 버킷"
 }
 
 output "ecr_repository_urls" {
   value       = module.platform.ecr_repository_urls
-  description = "서비스별 ECR 저장소"
+  description = "운영 서비스별 ECR 저장소"
 }
 
 output "ecs_cluster_name" {
   value       = module.platform.ecs_cluster_name
-  description = "ECS 클러스터 이름"
+  description = "운영 ECS 클러스터 이름"
 }
 
 output "backend_url" {
   value       = module.platform.backend_url
-  description = "외부 Backend ALB URL"
+  description = "운영 Backend HTTPS ALB URL"
 }
 
 output "aiserver_internal_url" {
   value       = module.platform.aiserver_internal_url
-  description = "VPC 내부 AI Server ALB URL"
+  description = "운영 VPC 내부 AI Server ALB URL"
 }
 
 output "service_role_arns" {
   value       = module.platform.service_role_arns
-  description = "서비스별 task role ARN"
+  description = "운영 서비스별 task role ARN"
 }

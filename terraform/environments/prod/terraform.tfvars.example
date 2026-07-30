@@ -1,28 +1,30 @@
-# 안전 검증 모드. 실제 plan 전 두 플래그와 비용·접근 경계를 별도로 승인합니다.
+# 저장소 기본값은 어떤 운영 자원도 만들지 않습니다.
 enable_aws_resources = false
 enable_ecs_services  = false
 aws_region           = "ap-northeast-2"
 
-# ECS 서비스 활성화 시 필수입니다.
+# 아래 값은 계정·비용·보안·개인정보 검토 후 별도 *.auto.tfvars 또는 CI 변수로 입력합니다.
 enable_nat_gateway       = false
 backend_ingress_cidrs    = []
 backend_certificate_arn  = null
+db_instance_class        = null
+db_allocated_storage     = null
+db_backup_retention_days = null
+document_retention_days  = null
+document_bucket_name     = null
 backend_image_uri        = ""
 aiserver_image_uri       = ""
-document_bucket_name     = null
 container_cpu_architecture = "X86_64"
 
-# 비민감 설정만 작성합니다.
 service_environment = {
   backend = {
-    SPRING_PROFILES_ACTIVE = "dev"
+    SPRING_PROFILES_ACTIVE = "prod"
   }
   aiserver = {
     AI_MODEL_PROVIDER = "rules"
   }
 }
 
-# 값 자체를 쓰지 말고 사전에 생성·승인된 Secrets Manager ARN만 참조합니다.
 service_secrets = {
   backend  = {}
   aiserver = {}
