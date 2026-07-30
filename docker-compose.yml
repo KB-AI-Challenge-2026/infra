@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16
+    image: pgvector/pgvector:pg16
     container_name: kb-ai-postgres
     restart: unless-stopped
     environment:
@@ -26,11 +26,15 @@ services:
       AI_MODEL_PROVIDER: ${AI_MODEL_PROVIDER:-rules}
       UPSTAGE_API_KEY: ${UPSTAGE_API_KEY:-}
       UPSTAGE_MODEL: ${UPSTAGE_MODEL:-solar-pro3}
+      OTEL_ENABLED: ${OTEL_ENABLED:-true}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
     ports:
       - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
+      otel-collector:
+        condition: service_started
     healthcheck:
       test:
         [
@@ -76,6 +80,14 @@ services:
         condition: service_healthy
       aiserver:
         condition: service_started
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.157.0
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./otel/collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "4318:4318"
 
 volumes:
   postgres_data:
