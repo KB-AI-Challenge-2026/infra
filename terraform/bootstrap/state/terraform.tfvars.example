@@ -1,0 +1,5 @@
+enable_bootstrap_resources = false
+aws_region                 = "ap-northeast-2"
+
+# 실제 생성 시 조직·계정 규칙에 맞는 전 세계 고유 이름으로 변경합니다.
+state_bucket_name = ""

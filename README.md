@@ -24,10 +24,13 @@ PostgreSQL 초기 계정은 로컬 개발 전용입니다. 이미 생성된 볼�
 
 ## Terraform
 
-Terraform 코드는 `infra/terraform` 아래에 있습니다. dev 상세 절차는
+Terraform 코드는 `infra/terraform` 아래에 있습니다. dev·prod와 원격 state 상세 절차는
 [Terraform README](./terraform/README.md)를 따릅니다.
 
 - 클라우드 공급자·계정·리전 확정 전에는 실제 자원을 `apply`하지 않습니다.
 - 개발과 운영은 별도 state와 변수 집합을 사용합니다.
+- Spring Boot는 외부 ALB, FastAPI는 내부 ALB와 별도 ECS service로 유지합니다.
+- 서비스별 execution role과 task role을 공유하지 않습니다.
 - state와 비밀값은 Git에 커밋하지 않습니다.
-- 변경 전 `terraform fmt -check`, `terraform validate`, `terraform plan`을 수행합니다.
+- 변경 전 `terraform fmt -check`, `terraform validate`, `terraform plan`,
+  `terraform test`를 수행합니다.
