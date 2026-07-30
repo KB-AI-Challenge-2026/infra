@@ -31,6 +31,34 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          ".venv/bin/python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health/ready', timeout=2)",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  aiserver-sync:
+    build:
+      context: ../aiserver
+    restart: unless-stopped
+    command: [".venv/bin/python", "-m", "knowledge.scheduler"]
+    environment:
+      DATABASE_URL: postgresql://kb_ai_user:kb_ai_password@postgres:5432/kbai
+      EXTERNAL_SYNC_INTERVAL_SECONDS: ${EXTERNAL_SYNC_INTERVAL_SECONDS:-43200}
+      LAW_OPEN_API_OC: ${LAW_OPEN_API_OC:-}
+      FSS_FINLIFE_AUTH_KEY: ${FSS_FINLIFE_AUTH_KEY:-}
+      DISCORD_WEBHOOK_URL: ${DISCORD_WEBHOOK_URL:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      aiserver:
+        condition: service_healthy
 
   backend:
     build:
