@@ -71,6 +71,7 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/kbai
       AI_BASE_URL: http://aiserver:8000
       DOCUMENT_STORAGE_DIR: /var/lib/kb-ai/documents
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-demo}
     ports:
       - "8080:8080"
     volumes:
@@ -79,7 +80,49 @@ services:
       postgres:
         condition: service_healthy
       aiserver:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/actuator/health/readiness"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  frontend:
+    build:
+      context: ../frontend
+    ports:
+      - "${FLUTTER_WEB_PORT:-4174}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  frontend-react:
+    build:
+      context: ../frontend-react
+    ports:
+      - "${ADVISOR_WEB_PORT:-4173}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  data-pipeline:
+    build:
+      context: ../data-pipeline
+    command:
+      - --dataset-root
+      - /input
+      - --catalog
+      - /app/config/datasets.json
+      - --artifact-root
+      - /artifacts
+      - --data-mode
+      - ${AIHUB_DATA_MODE:-SAMPLE}
+      - --run-id
+      - ${DATA_PIPELINE_RUN_ID:-compose-smoke}
+    volumes:
+      - ${AIHUB_DATASET_ROOT:-../aiserver/sample}:/input:ro
+      - ../data-pipeline/artifacts:/artifacts
+    restart: "no"
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.157.0
